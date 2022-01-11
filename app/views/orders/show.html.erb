@@ -3,11 +3,24 @@
   <header class="page-header">
     <h1>Order #<%= @order.id %></h1>
   </header>
-
+  
   <div class="order-summary jumbotron">
-    <h4>Thank you for your order!</h4>
+ 
+   <% @order.line_items.each do |item| %>
+        <% product = Product.find(item.product_id)%>
+        
+         <%= render 'item', product: product, quantity: item.quantity %>
+        <% end %>
+            
   </div>
 
   <%= link_to "Continue Shopping", root_path, class: 'btn btn-lg btn-primary' %>
 
 </section>
+
+
+    The line items in the order and:
+        Their image, name and description
+        Their respective quantities and line item totals
+    The final amount for the order
+    The email that was used
