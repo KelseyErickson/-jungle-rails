@@ -43,7 +43,7 @@ class OrdersController < ApplicationController
     )
 
     enhanced_cart.each do |entry|
-      product = entry[:product]
+      @product = entry[:product]
       quantity = entry[:quantity]
       order.line_items.new(
         product: product,
@@ -55,5 +55,10 @@ class OrdersController < ApplicationController
     order.save!
     order
   end
+
+  def enhanced_order
+    @enhanced_order ||= @order.line_items.map{|line_item| {quantity:'line_item.quatity', product: Product.find_by(id: line_item.product_id)}}
+  end
+  helper_method :enhanced_order
 
 end
