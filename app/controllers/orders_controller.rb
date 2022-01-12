@@ -61,4 +61,9 @@ class OrdersController < ApplicationController
   end
   helper_method :enhanced_order
 
+  def order_subtotal_cents
+    enhanced_order.map {|entry| entry[:product].price_cents * entry[:quantity]}.sum
+  end
+  helper_method :order_subtotal_cents
+
 end
