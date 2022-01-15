@@ -3,7 +3,11 @@
 </header>
 
 <%= form_tag "/login" do %>
-
+<% if flash[:errors] %>
+  <div class="alert alert-danger">
+    <p><%= flash[:errors] %></p>
+  </div>
+  <% end %>
  <div class="form-group">
   <label for="email">Email </label>
   <%= text_field_tag :email, "", class: "form-control"%>
