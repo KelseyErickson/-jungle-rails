@@ -30,7 +30,7 @@ RSpec.describe User, type: :model do
     it "will not validate if email has been registered" do
       @user = User.new(first_name:"name", last_name:"last_name", email:"sample@email.com", password: "password1234", password_confirmation: "password1234")
       @user.save!
-      @user2 = User.new(first_name:"name", last_name:"last_name", email:"SAMPLE@email.com", password: "password1234", password_confirmation: "password1234")
+      @user2 = User.new(first_name:"name", last_name:"last_name", email:"sample@email.com", password: "password1234", password_confirmation: "password1234")
       @user2.validate
       expect(@user2.errors.full_messages).to include("Email has already been taken") 
     end
@@ -53,16 +53,25 @@ RSpec.describe User, type: :model do
       expect(@user.errors.full_messages).to include("Last name can't be blank") 
     end
 
-    it "will not validate without a last name" do
-      @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "password1234", password_confirmation: "password1234")
-      @user.validate
-      expect(@user.errors.full_messages).to include("Last name can't be blank") 
-    end
-
     it "will have a password of at least 8 characters" do
       @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "123", password_confirmation: "123")
       @user.validate
       expect(@user.errors.full_messages).to include("Password is too short (minimum is 8 characters)") 
     end
   end
+
+  describe ".authenticate_with_credentials" do
+    it "will return nil if no user is found" do
+      @result = User.authenticate_with_credentials("sample@email.com", "password1234")
+      expect(@result).to be_nil
+    end
+
+    it "will return user if user is found" do
+      @user = User.new(first_name:"name", last_name: "last_name", email: "sample@email.com", password: "12345678", password_confirmation: "12345678")
+      @user.save!
+      @result = User.authenticate_with_credentials("sample@email.com", "12345678")
+      expect(@result).to eq(@user)
+    end
+  end
+
 end
