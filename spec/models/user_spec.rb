@@ -3,6 +3,12 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
   describe "validations" do
 
+    it "will save if validations are present" do
+      @user = User.new(first_name:"name", last_name:"last_name", email:"sample@email.com", password: "password1234", password_confirmation: "password1234")
+      @user.save!
+      expect(@user.id).to be_present
+    end
+
     it "will not validate without a password" do
       @user = User.new(first_name:"name", last_name:"last_name", email:"sample@email.com", password: nil, password_confirmation: nil)
       @user.validate
@@ -45,6 +51,18 @@ RSpec.describe User, type: :model do
       @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "password1234", password_confirmation: "password1234")
       @user.validate
       expect(@user.errors.full_messages).to include("Last name can't be blank") 
+    end
+
+    it "will not validate without a last name" do
+      @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "password1234", password_confirmation: "password1234")
+      @user.validate
+      expect(@user.errors.full_messages).to include("Last name can't be blank") 
+    end
+
+    it "will have a password of at least 8 characters" do
+      @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "123", password_confirmation: "123")
+      @user.validate
+      expect(@user.errors.full_messages).to include("Password is too short (minimum is 8 characters)") 
     end
   end
 end
