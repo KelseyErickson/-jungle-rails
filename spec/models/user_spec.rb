@@ -9,6 +9,8 @@ RSpec.describe User, type: :model do
       expect(@user.id).to be_present
     end
 
+    #password validations
+
     it "will not validate without a password" do
       @user = User.new(first_name:"name", last_name:"last_name", email:"sample@email.com", password: nil, password_confirmation: nil)
       @user.validate
@@ -27,6 +29,13 @@ RSpec.describe User, type: :model do
       expect(@user.errors.full_messages).to include("Password confirmation doesn't match Password") 
     end
 
+    it "will have a password of at least 8 characters" do
+      @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "123", password_confirmation: "123")
+      @user.validate
+      expect(@user.errors.full_messages).to include("Password is too short (minimum is 8 characters)") 
+    end
+    #email validations
+
     it "will not validate if email has been registered" do
       @user = User.new(first_name:"name", last_name:"last_name", email:"sample@email.com", password: "password1234", password_confirmation: "password1234")
       @user.save!
@@ -41,6 +50,14 @@ RSpec.describe User, type: :model do
       expect(@user.errors.full_messages).to include("Email can't be blank") 
     end
 
+    it "will remove spaces around the email" do
+      @user = User.new(first_name:"name", last_name:"last_name", email: "  sample@email.com ", password: "password1234", password_confirmation: "password1234")
+      @user.save!
+      expect(@user.email).to eq("sample@email.com")
+    end
+
+    #name validations
+
     it "will not validate without a first name" do
       @user = User.new(first_name: nil, last_name:"last_name", email: "sample@email.com", password: "password1234", password_confirmation: "password1234")
       @user.validate
@@ -51,12 +68,6 @@ RSpec.describe User, type: :model do
       @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "password1234", password_confirmation: "password1234")
       @user.validate
       expect(@user.errors.full_messages).to include("Last name can't be blank") 
-    end
-
-    it "will have a password of at least 8 characters" do
-      @user = User.new(first_name:"name", last_name:nil, email: "sample@email.com", password: "123", password_confirmation: "123")
-      @user.validate
-      expect(@user.errors.full_messages).to include("Password is too short (minimum is 8 characters)") 
     end
   end
 
@@ -70,6 +81,13 @@ RSpec.describe User, type: :model do
       @user = User.new(first_name:"name", last_name: "last_name", email: "sample@email.com", password: "12345678", password_confirmation: "12345678")
       @user.save!
       @result = User.authenticate_with_credentials("sample@email.com", "12345678")
+      expect(@result).to eq(@user)
+    end
+
+    it "will return user even if email is in a different case" do
+      @user = User.new(first_name:"name", last_name: "last_name", email: "SamPLE@eMail.com", password: "12345678", password_confirmation: "12345678")
+      @user.save!
+      @result = User.authenticate_with_credentials("SAMPLE@email.com", "12345678")
       expect(@result).to eq(@user)
     end
   end
